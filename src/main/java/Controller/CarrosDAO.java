@@ -16,13 +16,14 @@ public class CarrosDAO {
     private Connection connection;
     private List<Carros> carros;
 
+    // Construtor que obtém uma conexão ao criar uma instância
     public CarrosDAO() {
         this.connection = ConnectionFactory.getConnection();
     }
 
+    // Método para criar a tabela no banco de dados se ela não existir
     public void criaTabela() {
-
-        String sql = "CREATE TABLE IF NOT EXISTS carros_lojacarros (MARCA VARCHAR(255),MODELO VARCHAR(255),ANO VARCHAR(255),PLACA VARCHAR(255) PRIMARY KEY, VALOR VARCHAR(255))";
+        String sql = "CREATE TABLE IF NOT EXISTS carros_lojacarros (MARCA VARCHAR(255), MODELO VARCHAR(255), ANO VARCHAR(255), PLACA VARCHAR(255) PRIMARY KEY, VALOR VARCHAR(255))";
         try (Statement stmt = this.connection.createStatement()) {
             stmt.execute(sql);
             System.out.println("Tabela criada com sucesso.");
@@ -33,35 +34,35 @@ public class CarrosDAO {
         }
     }
 
+    // Método para listar todos os carros no banco de dados
     public List<Carros> listarTodos() {
         PreparedStatement stmt = null;
-        ResultSet rs = null; 
-        carros = new ArrayList<>(); 
-    
+        ResultSet rs = null;
+        carros = new ArrayList<>();
+
         try {
-            stmt = connection.prepareStatement("SELECT * FROM carros_lojacarros"); 
-            
-            rs = stmt.executeQuery(); 
-    
+            stmt = connection.prepareStatement("SELECT * FROM carros_lojacarros");
+            rs = stmt.executeQuery();
+
             while (rs.next()) {
-               
                 Carros carro = new Carros(
-                    rs.getString("marca"),
-                    rs.getString("modelo"),
-                    rs.getString("ano"),
-                    rs.getString("placa"),
-                    rs.getString("valor")
+                        rs.getString("marca"),
+                        rs.getString("modelo"),
+                        rs.getString("ano"),
+                        rs.getString("placa"),
+                        rs.getString("valor")
                 );
                 carros.add(carro);
             }
         } catch (SQLException ex) {
-            System.out.println(ex); 
+            System.out.println(ex);
         } finally {
-            ConnectionFactory.closeConnection(connection, stmt, rs); 
+            ConnectionFactory.closeConnection(connection, stmt, rs);
         }
-        return carros; 
+        return carros;
     }
 
+    // Método para cadastrar um novo carro no banco de dados
     public void cadastrar(String marca, String modelo, String ano, String placa, String valor) {
         PreparedStatement stmt = null;
 
@@ -75,10 +76,10 @@ public class CarrosDAO {
             stmt.setString(5, valor);
             stmt.executeUpdate();
             System.out.println("Dados inseridos com sucesso");
-            JOptionPane.showMessageDialog(null, "Você Cadastrou o carro com sucesso✅");
+            JOptionPane.showMessageDialog(null, "Você cadastrou o carro com sucesso✅");
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) {
-                JOptionPane.showMessageDialog(null, "\"Erro: A placa inserida já existe na tabela.\"");
+                JOptionPane.showMessageDialog(null, "Erro: A placa inserida já existe na tabela.");
             } else {
                 throw new RuntimeException("Erro ao inserir dados no banco de dados.", e);
             }
@@ -87,6 +88,7 @@ public class CarrosDAO {
         }
     }
 
+    // Método para atualizar os dados de um carro no banco de dados
     public void atualizar(String marca, String modelo, String ano, String placa, String valor) {
         PreparedStatement stmt = null;
 
@@ -107,13 +109,14 @@ public class CarrosDAO {
         }
     }
 
+    // Método para apagar um carro do banco de dados pelo número da placa
     public void apagar(String placa) {
         PreparedStatement stmt = null;
         String sql = "DELETE FROM carros_lojacarros WHERE placa = ?";
         try {
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, placa);
-            stmt.executeUpdate(); 
+            stmt.executeUpdate();
             System.out.println("Dado apagado com sucesso");
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao apagar dados no banco de dados.", e);
@@ -121,5 +124,4 @@ public class CarrosDAO {
             ConnectionFactory.closeConnection(connection, stmt);
         }
     }
-
 }
