@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Connection.ConnectionFactory;
-import Model.Clientes;
 import Model.Vendas;
 
 public class VendasDAO {
@@ -17,13 +16,14 @@ public class VendasDAO {
     private Connection connection;
     private List<Vendas> vendas;
 
+    // Construtor que obtém uma conexão ao criar uma instância
     public VendasDAO() {
         this.connection = ConnectionFactory.getConnection();
     }
 
+    // Método para criar a tabela no banco de dados se ela não existir
     public void criaTabela() {
-
-        String sql = "CREATE TABLE IF NOT EXISTS vendas_lojacarros (DATA VARCHAR(255),CLIENTE VARCHAR(255),VALOR VARCHAR(255),CARRO VARCHAR(255) PRIMARY KEY)";
+        String sql = "CREATE TABLE IF NOT EXISTS vendas_lojacarros (DATA VARCHAR(255), CLIENTE VARCHAR(255), VALOR VARCHAR(255), CARRO VARCHAR(255) PRIMARY KEY)";
         try (Statement stmt = this.connection.createStatement()) {
             stmt.execute(sql);
             System.out.println("Tabela criada com sucesso.");
@@ -34,6 +34,7 @@ public class VendasDAO {
         }
     }
 
+    // Método para listar todas as vendas no banco de dados
     public List<Vendas> listarTodos() {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -41,11 +42,9 @@ public class VendasDAO {
 
         try {
             stmt = connection.prepareStatement("SELECT * FROM vendas_lojacarros");
-
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-
                 Vendas venda = new Vendas(
                         rs.getString("data"),
                         rs.getString("cliente"),
@@ -61,6 +60,7 @@ public class VendasDAO {
         return vendas;
     }
 
+    // Método para cadastrar uma nova venda no banco de dados
     public void cadastrar(String data, String cliente, String valor, String carro) {
         PreparedStatement stmt = null;
 
@@ -80,6 +80,7 @@ public class VendasDAO {
         }
     }
 
+    // Método para atualizar os dados de uma venda no banco de dados
     public void atualizar(String data, String cliente, String valor, String carro) {
         PreparedStatement stmt = null;
 
@@ -100,6 +101,7 @@ public class VendasDAO {
         }
     }
 
+    // Método para apagar uma venda do banco de dados pelo tipo de carro
     public void apagar(String carro) {
         PreparedStatement stmt = null;
 
@@ -115,5 +117,4 @@ public class VendasDAO {
             ConnectionFactory.closeConnection(connection, stmt);
         }
     }
-
 }
